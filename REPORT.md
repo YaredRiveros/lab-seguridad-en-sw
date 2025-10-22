@@ -107,6 +107,13 @@ Ejemplo de app parcheada:
 
 <img width="1219" height="433" alt="image" src="https://github.com/user-attachments/assets/25e131c9-7e5f-4cfe-988b-e9a45e59a868" />
   
+Se logra prevenir SQL injections usando consultas parametrizadas:
+
+```python
+db = get_db()
+# Usar consulta parametrizada para prevenir SQL injection
+query = "SELECT id, username, bio FROM users WHERE username = ?"
+cur = db.cursor()
 
 
 2) ¿Cómo extraer datos sensibles (por ejemplo, la contraseña o bio del admin)?
@@ -201,6 +208,7 @@ Resumen de entregables
 - `REPORT.md` — respuestas y explicación de prevención con bibliografía
 
 Fin del informe.
+
 
 
 
