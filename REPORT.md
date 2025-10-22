@@ -100,6 +100,15 @@ Nota: las preguntas originales del PDF no se pudieron extraer como texto legible
   Resultado: lista todos los usuarios.
 - Evidencia: la plantilla muestra la consulta ejecutada y los resultados (incluyendo `admin`).
 
+Ejemplo de app vulnerable:
+  <img width="1348" height="442" alt="image" src="https://github.com/user-attachments/assets/72269595-25f0-427e-9741-9d42bbf10b6c" />
+
+Ejemplo de app parcheada:
+
+<img width="1219" height="433" alt="image" src="https://github.com/user-attachments/assets/25e131c9-7e5f-4cfe-988b-e9a45e59a868" />
+  
+
+
 2) ¿Cómo extraer datos sensibles (por ejemplo, la contraseña o bio del admin)?
 - En la DB de ejemplo el campo `bio` contiene texto que actúa como "secreto". Con inyección se puede forzar un `UNION` o seleccionar campos distintos. En SQLite, puede probarse:
   `' UNION SELECT 1, username, bio FROM users--`
@@ -126,7 +135,10 @@ Ejemplos usando GET (payloads sobre la URL):
 Comportamiento observado:
 - vulnerable_app: la query string se concatena en un comando ejecutado con `shell=True`. Eso permite que operadores de shell (`;`, `&&`, `|`) introducidos por el atacante se ejecuten. En sistemas UNIX, `/ping?host=127.0.0.1; ls` ejecutará `ping -c 1 127.0.0.1; ls` y la salida de `ls` aparecerá en el cuerpo de la respuesta (texto plano). En Windows, se utiliza `&&` para concatenar consultas en shell y se usan las opciones `-n` en lugar de `-c` para el ping. 
 
+<img width="1025" height="703" alt="image" src="https://github.com/user-attachments/assets/33ae6da3-f44f-4609-b967-9dd461dc4489" />
+
 - patched_app: con el mismo payload la aplicación parcheada valida el parámetro `host` (solo `[0-9a-zA-Z.-]`) y ejecuta `subprocess.run` con una lista de argumentos (sin `shell=True`). Por tanto el input no se interpreta por un shell: los caracteres `;`, `&&` no separan comandos y no provocan ejecución adicional. Si la validación falla, la app responde "Host inválido".
+<img width="952" height="305" alt="image" src="https://github.com/user-attachments/assets/712a2014-9c29-4991-b71c-129409e2113e" />
 
 Ejemplo práctico de comportamiento:
 - Vulnerable: GET `/ping?host=127.0.0.1; ls` → respuesta muestra "Comando ejecutado: ping -c 1 127.0.0.1; ls" y luego el listado de archivos.
@@ -138,7 +150,7 @@ Recomendaciones (resumen): evitar `shell=True`, validar entrada, y preferir APIs
 
 Ejemplos de logging
 -------------------
-A continuación se incluyen ejemplos reales extraídos de los ficheros de log de cada aplicación que muestran un intento de inyección por línea de comando usando `whoami`:
+Estos logs se pueden encontrar en las siguientes direcciones del repositorio en github patched_app/patched_app.log y vulnerable_app/vuln_app.log. A continuación se incluyen ejemplos reales extraídos de los ficheros de log de cada aplicación que muestran un intento de inyección por línea de comando usando `whoami`.:
 
 - App vulnerable
   - 2025-10-21 20:07:11,344 INFO Request from 127.0.0.1 endpoint=/ping params=host=127.0.0.1 UA=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 suspicious=False
@@ -184,10 +196,6 @@ Bibliografía y referencias para cita (ejemplos académicos)
 - Anley, C. (2002). "Advanced SQL Injection in SQL Server Applications". (Técnicas y análisis, clásico en la temática).
 - Sudholt, S., & Strembeck, M. (2013). "Detecting SQL injection vulnerabilities using taint analysis". Journal article (explica técnicas estáticas/dinámicas para detección).
 
-Cómo cité y verifiqué
-- Implementé la vulnerabilidad concatenando la entrada del usuario en la consulta SQL en `vulnerable_app/app.py`.
-- Implementé la corrección usando parámetros (prepared statements) en `patched_app/app.py`.
-
 Resumen de entregables
 ----------------------
 - `vulnerable_app/` (app vulnerable) — demuestra SQLi simple
@@ -195,3 +203,4 @@ Resumen de entregables
 - `REPORT.md` — respuestas y explicación de prevención con bibliografía
 
 Fin del informe.
+
