@@ -165,4 +165,5 @@ def search():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    # Bind to 0.0.0.0 so the container port is reachable from the host
+    app.run(debug=True, host='0.0.0.0', port=5001)

@@ -136,3 +136,73 @@ Siguientes pasos (opcional)
 - Extraer texto legible del PDF original para responder exactamente según las preguntas del enunciado, si el usuario facilita una versión con OCR o texto.
 
 Fin del informe.
+
+Ejecución con Docker Compose
+----------------------------
+Sigue estos pasos para ejecutar las dos aplicaciones dentro de contenedores Docker. Las instrucciones están escritas para PowerShell en Windows; en macOS/Linux los pasos son equivalentes adaptando la sintaxis de la shell.
+
+Requisitos
+- Tener instalado Docker Desktop (incluye Docker Engine y Docker Compose). Asegúrate de que Docker esté corriendo antes de continuar.
+
+Pasos para clonar, construir y ejecutar (mínimos)
+1. Clonar el repositorio:
+
+  git clone <URL-del-repo>
+  cd lab-seguridad-en-sw
+
+2. Inicializar las bases de datos (opciones):
+
+  a) Si tienes Python en el host (rápido):
+
+    # En PowerShell (desde la raíz del repo)
+    python vulnerable_app/init_db.py
+    python patched_app/init_db.py
+
+  b) Si NO tienes Python en el host: ejecutar la inicialización dentro de los contenedores usando Docker Compose (no modifica tu host):
+
+    docker-compose run --rm vulnerable_app python init_db.py
+    docker-compose run --rm patched_app python init_db.py
+
+  Nota: tras los cambios recientes, los volúmenes del proyecto están montados en modo lectura/escritura por defecto, por lo que los archivos `data.db` y los logs que se creen dentro del contenedor aparecerán en las carpetas locales correspondientes.
+
+3. Construir las imágenes con docker-compose (desde la raíz del repo):
+
+  docker-compose build
+
+4. Levantar los servicios (reconstruye si es necesario):
+
+  docker-compose up --build
+
+  - Esto expondrá `vulnerable_app` en el puerto 5000 de la máquina y `patched_app` en el puerto 5001 según `docker-compose.yml`.
+  - Si prefieres ejecutar en segundo plano, añade `-d`:
+
+    docker-compose up -d --build
+
+5. Comprobar que las apps están corriendo:
+
+  - Vulnerable: http://127.0.0.1:5000/
+  - Patched:   http://127.0.0.1:5001/
+
+6. Parar los servicios cuando termines:
+
+  docker-compose down
+
+Notas y recomendaciones (actualizadas)
+- Los volúmenes en `docker-compose.yml` están montados en modo lectura/escritura para permitir que las aplicaciones creen archivos de log (`*.log`) y las bases de datos (`data.db`) dentro de las carpetas `vulnerable_app/` y `patched_app/`. Esto evita errores como "Read-only file system" cuando la app intenta abrir/crear logs.
+- Las aplicaciones Flask están configuradas para escuchar en `0.0.0.0` dentro del contenedor, por lo que los puertos mapeados funcionan desde el host (es decir, `http://127.0.0.1:5000/` y `http://127.0.0.1:5001/` son accesibles desde tu navegador).
+- Si prefieres no permitir que los contenedores escriban sobre el código fuente local, una alternativa más limpia es usar volúmenes nombrados para datos/logs. Ejemplo en `docker-compose.yml`:
+
+  services:
+   vulnerable_app:
+    volumes:
+      - ./vulnerable_app:/app:ro   # código en modo sólo lectura
+      - vuln_data:/app/data       # volumen nombrado para DB/logs
+
+  volumes:
+   vuln_data:
+
+  Con esto el código queda protegido y los datos/logs se almacenan en un volumen gestionado por Docker.
+- Si tu profesor no tiene Python y prefieres inicializar las DB automáticamente al arrancar, puedo preparar una versión de los `Dockerfile` o un `entrypoint` que ejecute `init_db.py` durante el build o al inicio del contenedor.
+- Observación: Docker Compose emite una advertencia si el campo `version` está presente en `docker-compose.yml` (en algunas versiones modernas de Compose la clave `version` ya no es necesaria). Puedes eliminar la línea `version: '3.8'` para evitar la advertencia, aunque no afecta el funcionamiento.
+
+Fin de la sección Docker Compose.

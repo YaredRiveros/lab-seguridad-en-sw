@@ -6,7 +6,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./vulnerable_app:/app:ro
+      - ./vulnerable_app:/app
     restart: unless-stopped
 
   patched_app:
@@ -15,5 +15,5 @@ services:
     ports:
       - "5001:5001"
     volumes:
-      - ./patched_app:/app:ro
+      - ./patched_app:/app
     restart: unless-stopped

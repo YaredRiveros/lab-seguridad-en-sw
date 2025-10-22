@@ -122,4 +122,5 @@ def search():
     return render_template('results.html', rows=rows, error=None, query=query)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Bind to 0.0.0.0 so the container port is reachable from the host
+    app.run(debug=True, host='0.0.0.0', port=5000)
