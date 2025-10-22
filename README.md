@@ -16,3 +16,6 @@ docker-compose down
 Las apps estarán en:
 - http://localhost:5000 -> vulnerable_app
 - http://localhost:5001 -> patched_app
+
+Por favor, lea el informe de la aplicación completa en REPORT.md
+
