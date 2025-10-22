@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Patched app - Search</title>
+  </head>
+  <body>
+    <h1>Patched app</h1>
+    <p>Introduce un <strong>username</strong> para buscar en la base de datos.</p>
+    <form action="/search" method="post">
+      <input name="username" placeholder="username" />
+      <button type="submit">Buscar</button>
+    </form>
+    <p>Esta versión usa consultas parametrizadas para prevenir SQL injection.</p>
+  </body>
+</html>

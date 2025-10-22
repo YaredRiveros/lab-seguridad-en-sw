@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ping - Patched</title>
+  </head>
+  <body>
+    <h1>Ping (patched)</h1>
+    <form action="/ping/exec" method="post">
+      <input name="host" placeholder="host or IP" />
+      <button type="submit">Ping</button>
+    </form>
+    <p>Esta versión valida la entrada y no usa <code>shell=True</code>.</p>
+    <p><a href="/">Volver</a></p>
+  </body>
+</html>

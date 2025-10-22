@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Vulnerable app - Search</title>
+  </head>
+  <body>
+    <h1>Vulnerable app</h1>
+    <p>Introduce un <strong>username</strong> para buscar en la base de datos.</p>
+    <form action="/search" method="post">
+      <input name="username" placeholder="username" />
+      <button type="submit">Buscar</button>
+    </form>
+    <p>Ejemplo de explotación: usa <code>' OR '1'='1</code> para listar todos los usuarios.</p>
+  </body>
+</html>

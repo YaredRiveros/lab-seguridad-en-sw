@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  vulnerable_app:
+    build: ./vulnerable_app
+    container_name: vulnerable_app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./vulnerable_app:/app:ro
+    restart: unless-stopped
+
+  patched_app:
+    build: ./patched_app
+    container_name: patched_app
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./patched_app:/app:ro
+    restart: unless-stopped
