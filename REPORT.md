@@ -153,20 +153,18 @@ Ejemplos de logging
 Estos logs se pueden encontrar en las siguientes direcciones del repositorio en github patched_app/patched_app.log y vulnerable_app/vuln_app.log. A continuación se incluyen ejemplos reales extraídos de los ficheros de log de cada aplicación que muestran un intento de inyección por línea de comando usando `whoami`.:
 
 - App vulnerable
-  - 2025-10-21 20:07:11,344 INFO Request from 127.0.0.1 endpoint=/ping params=host=127.0.0.1 UA=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 suspicious=False
-  - 2025-10-21 20:07:11,384 INFO Executed command for 127.0.0.1: ping -n 1 127.0.0.1
-  - 2025-10-21 20:07:39,687 INFO Request from 127.0.0.1 endpoint=/ping params=host=127.0.0.1&&whoami UA=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 suspicious=True
-  - 2025-10-21 20:07:39,751 INFO Executed command for 127.0.0.1: ping -n 1 127.0.0.1&&whoami
+
+<img width="951" height="390" alt="image" src="https://github.com/user-attachments/assets/f9317dcf-65f6-4543-9d7d-9f785f24dc43" />
+
 
 - App parcheada
-  - 2025-10-21 20:07:19,628 INFO Request from 127.0.0.1 endpoint=/ping params=host=127.0.0.1 UA=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 suspicious=False
-  - 2025-10-21 20:07:19,648 INFO Executed safe ping for 127.0.0.1: ping -n 1 127.0.0.1
-  - 2025-10-21 20:07:49,414 INFO Request from 127.0.0.1 endpoint=/ping params=host=127.0.0.1&&whoami UA=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 suspicious=True
+<img width="954" height="331" alt="image" src="https://github.com/user-attachments/assets/11a590b8-0df0-4b08-b927-a15dc61b0fea" />
+
 
 Ambas aplicaciones detectaron la acción como sospechosa (campo `suspicious=True`), pero solo la versión parcheada evitó la ejecución del comando adicional `whoami` (la app parcheada valida el parámetro y ejecuta `ping` sin `shell=True`).
 
 
-5) Comparación con la app parcheada — ¿qué cambia?
+5) Comparación con la app parcheada
 - La app parcheada usa consultas parametrizadas con `?` (SQLite) y pasa los parámetros separadamente. Los parámetros no se concatenan al SQL y el motor trata la entrada como dato, no como código SQL. Por eso payloads como `' OR '1'='1` no alteran la lógica de la consulta. Internamente, esto ocurre porque el primer paso de una consulta parametrizada es compilar el código de la consulta, sin tomar en cuenta el parámetro. Por tanto, el parámetro ya no puede cambiar la estructura de la consulta precompilada.
 - Resultado observable: en la versión parcheada la búsqueda de `' OR '1'='1` devolverá "No hay resultados" o buscará literalmente el username con esos caracteres.
 
@@ -203,5 +201,6 @@ Resumen de entregables
 - `REPORT.md` — respuestas y explicación de prevención con bibliografía
 
 Fin del informe.
+
 
 
