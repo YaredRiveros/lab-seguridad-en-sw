@@ -198,31 +198,60 @@ Ambas aplicaciones detectaron la acción como sospechosa (campo `suspicious=True
   - Entrada: alice -> devuelve alice.
   - Entrada: ' OR '1'='1 -> no devuelve todos; la entrada se busca literalmente, no ejecuta SQL.
 
-Item 7 — Técnicas de prevención
----------------------------------------------------------------------------
-En la siguiente sección se discuten técnicas de prevención de inyección SQL y otras medidas complementarias, con referencias a literatura científica.
+## Item 7 - Técnicas principales de prevención
 
-Técnicas principales de prevención
-- Consultas parametrizadas / prepared statements: separar código SQL de datos. Es la defensa más efectiva y recomendada.
-- Validación y saneamiento de entrada: filtrar o normalizar datos de entrada; no es suficiente por sí sola, pero útil como capa adicional.
-- Uso de ORM con consultas seguras: muchos ORMs generan SQL parametrizado por defecto.
-- Least privilege: la cuenta de BD usada por la app debe tener permisos mínimos.
-- Escapar correctamente los datos (cuando no haya parametrización), aunque es menos preferible.
-- Monitoreo y detección: WAFs, detección de anomalías y registros de auditoría.
+### 1. Consultas parametrizadas / prepared statements  
+Separan el **código SQL** de los **datos proporcionados por el usuario**, evitando que estos últimos se interpreten como parte de una instrucción SQL.  
+Los valores son enviados al motor de base de datos como **parámetros precompilados**, no como texto concatenado.  
+Esto evita por completo la inyección de SQL, incluso si el atacante introduce caracteres especiales o sentencias maliciosas.  
+Es la **defensa más efectiva y recomendada**, y está disponible en la mayoría de frameworks y librerías (por ejemplo, `cursor.execute(query, params)` en Python o `PreparedStatement` en Java).
 
-Bibliografía y referencias para cita (ejemplos académicos)
-- Halfond, W. G., Viegas, J., & Orso, A. (2006). "A Classification of SQL Injection Attacks and Countermeasures". In Proceedings of the IEEE International Symposium on Secure Software Engineering. (Describen clasificación de ataques SQLi y técnicas de prevención).
-- OWASP Foundation. "SQL Injection Prevention Cheat Sheet". (Guía práctica y técnica, ampliamente citada). https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
-- Anley, C. (2002). "Advanced SQL Injection in SQL Server Applications". (Técnicas y análisis, clásico en la temática).
-- Sudholt, S., & Strembeck, M. (2013). "Detecting SQL injection vulnerabilities using taint analysis". Journal article (explica técnicas estáticas/dinámicas para detección).
+---
+
+### 2. Validación y saneamiento de entrada  
+Implica **verificar que los datos cumplan con el formato esperado** (por ejemplo, que un ID sea numérico o un email tenga estructura válida).  
+También se puede **normalizar o limpiar** la entrada eliminando caracteres no permitidos o codificando contenido especial.  
+Si bien no evita por sí sola una inyección, **reduce la superficie de ataque** y previene otros problemas (como XSS o errores lógicos).  
+Debe aplicarse **en la capa más cercana al punto de entrada** de los datos (formularios, APIs, etc.).
+
+---
+
+### 3. Uso de ORM con consultas seguras  
+Los **Object-Relational Mappers (ORMs)** abstraen las consultas SQL en funciones o métodos, generando internamente SQL parametrizado.  
+Ejemplos: SQLAlchemy, Django ORM, Hibernate.  
+Mientras se usen **métodos ORM estándar** (sin concatenar cadenas SQL manualmente), el riesgo de inyección es muy bajo.  
+Aun así, si se recurre a consultas "raw" (consultas crudas), deben seguir usándose **placeholders** o parámetros seguros.
+
+---
+
+### 4. Principio de menor privilegio (Least Privilege)  
+La cuenta de base de datos utilizada por la aplicación debe tener **únicamente los permisos necesarios** (por ejemplo, `SELECT`, `INSERT`, pero no `DROP` o `ALTER`).  
+Esto **limita el impacto** en caso de que una inyección ocurra: el atacante no podrá modificar la estructura ni acceder a datos sensibles fuera del alcance permitido.  
+Idealmente, distintas partes del sistema deberían usar **credenciales con privilegios diferenciados**.
+
+---
+
+### 5. Escapar correctamente los datos (cuando no haya parametrización)  
+Si por alguna razón no se puede usar parametrización, los datos deben ser **escapados o codificados** antes de insertarse en el SQL.  
+Esto significa **neutralizar caracteres especiales** (`'`, `"`, `;`, `--`, etc.) que puedan alterar la lógica de la consulta.  
+Sin embargo, este método **es propenso a errores** y depende del motor de base de datos (MySQL, PostgreSQL, etc.), por lo que solo se considera **una medida de último recurso**.
+
+---
+
+### 6. Monitoreo y detección  
+El uso de **firewalls de aplicaciones web (WAFs)** puede ayudar a detectar y bloquear intentos conocidos de inyección SQL mediante patrones.  
+Asimismo, el **registro y monitoreo de actividad** (auditoría de logs, detección de anomalías en consultas) permite **identificar comportamientos sospechosos** o patrones de ataque en tiempo real.  
+No previene directamente la inyección, pero es una **defensa en profundidad** valiosa para detección temprana y respuesta.
+
 
 Resumen de entregables
 ----------------------
-- `vulnerable_app/` (app vulnerable) — demuestra SQLi simple
-- `patched_app/` (app parcheada) — mismo comportamiento, con consultas parametrizadas
+- `vulnerable_app/` (app vulnerable) — demuestra SQLi simple y logging.
+- `patched_app/` (app parcheada) — mismo comportamiento, con consultas parametrizadas, evita la introducción directamente en la shell, y presenta logging. 
 - `REPORT.md` — respuestas y explicación de prevención con bibliografía
 
 Fin del informe.
+
 
 
 
