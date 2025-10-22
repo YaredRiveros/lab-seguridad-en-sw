@@ -89,7 +89,7 @@ Notas y recomendaciones (actualizadas)
 
 Fin de la sección Docker Compose.
 
-Respuestas / Observaciones (Preguntas 1-6)
+SQL injection
 -----------------------------------------
 Nota: las preguntas originales del PDF no se pudieron extraer como texto legible desde el PDF adjunto en este entorno. Asumí que las preguntas 1-6 buscan demostrar vulnerabilidades de inyección SQL, extracción de datos, comparación y mitigación. A continuación se proponen respuestas prácticas y pasos de verificación que cubren las típicas preguntas de laboratorio.
 
@@ -203,4 +203,5 @@ Resumen de entregables
 - `REPORT.md` — respuestas y explicación de prevención con bibliografía
 
 Fin del informe.
+
 
