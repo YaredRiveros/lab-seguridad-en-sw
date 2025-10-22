@@ -114,7 +114,7 @@ db = get_db()
 # Usar consulta parametrizada para prevenir SQL injection
 query = "SELECT id, username, bio FROM users WHERE username = ?"
 cur = db.cursor()
-
+```
 
 2) ¿Cómo extraer datos sensibles (por ejemplo, la contraseña o bio del admin)?
 - En la DB de ejemplo el campo `bio` contiene texto que actúa como "secreto". Con inyección se puede forzar un `UNION` o seleccionar campos distintos. En SQLite, puede probarse:
@@ -150,6 +150,21 @@ Comportamiento observado:
 Ejemplo práctico de comportamiento:
 - Vulnerable: GET `/ping?host=127.0.0.1; ls` → respuesta muestra "Comando ejecutado: ping -c 1 127.0.0.1; ls" y luego el listado de archivos.
 - Patched: GET `/ping?host=127.0.0.1; ls` → validación falla (carácter `;`), responde "Host inválido".
+
+La forma de mitigarla en el código fue evitando el uso del parámetro shell=True en la surinta subprocess.run:
+```python
+# Build argument list and execute without shell
+if os.name == 'nt':
+    cmd_list = ['ping', '-n', '1', host]
+else:
+    cmd_list = ['ping', '-c', '1', host]
+try:
+    proc = subprocess.run(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=10)
+    output = proc.stdout
+except Exception as e:
+    output = str(e)
+cmd = ' '.join(shlex.quote(p) for p in cmd_list)
+```
 
 Nota: Para windows, usar `%26%26` en vez de `;` -> `%26%26` es `&&` en URL-encoded, que concatena consultas en cmd.
 
@@ -208,6 +223,7 @@ Resumen de entregables
 - `REPORT.md` — respuestas y explicación de prevención con bibliografía
 
 Fin del informe.
+
 
 
 
