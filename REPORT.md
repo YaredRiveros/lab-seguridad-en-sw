@@ -166,7 +166,7 @@ Ambas aplicaciones detectaron la acción como sospechosa (campo `suspicious=True
   - Entrada: alice -> devuelve alice.
   - Entrada: ' OR '1'='1 -> no devuelve todos; la entrada se busca literalmente, no ejecuta SQL.
 
-Item 7 — Técnicas de prevención (no implementar, solo teoría y referencias)
+Item 7 — Técnicas de prevención
 ---------------------------------------------------------------------------
 En la siguiente sección se discuten técnicas de prevención de inyección SQL y otras medidas complementarias, con referencias a literatura científica.
 
@@ -188,22 +188,10 @@ Cómo cité y verifiqué
 - Implementé la vulnerabilidad concatenando la entrada del usuario en la consulta SQL en `vulnerable_app/app.py`.
 - Implementé la corrección usando parámetros (prepared statements) en `patched_app/app.py`.
 
-Validación rápida (comprobación de sintaxis)
--------------------------------------------
-Se creó código Python simple y templates Jinja2. Para comprobar sintaxis ejecutar en PowerShell:
-
-python -m py_compile vulnerable_app/app.py patched_app/app.py
-
 Resumen de entregables
 ----------------------
 - `vulnerable_app/` (app vulnerable) — demuestra SQLi simple
 - `patched_app/` (app parcheada) — mismo comportamiento, con consultas parametrizadas
 - `REPORT.md` — respuestas y explicación de prevención con bibliografía
-
-Siguientes pasos (opcional)
----------------------------
-- Integrar pruebas automatizadas (pytest) para demostrar diferencia de comportamiento.
-- Añadir WAF o pruebas con sqlmap para automatizar la explotación.
-- Extraer texto legible del PDF original para responder exactamente según las preguntas del enunciado, si el usuario facilita una versión con OCR o texto.
 
 Fin del informe.
